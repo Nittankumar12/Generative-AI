@@ -47,3 +47,23 @@ docker build -t ml-deployment-docker:v2 .
 docker run -p 8001:8000 ml-deployment-docker:v2
 You can now access v1 at http://localhost:8000/docs and v2 at http://localhost:8001/docs simultaneously!
 
+
+
+## ⚖️ 5. A/B Testing & Canary Deployments
+
+This API supports dynamic traffic splitting between Version 1 and Version 2 models using deterministic hashing based on the `user_id`. 
+
+We control the traffic split using the `CANARY_PCT` environment variable. **No code redeployment is required to change the split!**
+
+```bash
+# Build the unified A/B testing image
+docker build -t ml-deployment-docker:latest .
+
+# 🧪 CANARY DEPLOYMENT: Send 10% of users to v2, 90% to v1
+docker run -p 8000:8000 -e CANARY_PCT=10 ml-deployment-docker:latest
+
+# 🚀 FULL PROMOTION: Send 100% of users to v2
+docker run -p 8000:8000 -e CANARY_PCT=100 ml-deployment-docker:latest
+
+# 🛑 INSTANT ROLLBACK: Send 0% of users to v2 (100% to v1)
+docker run -p 8000:8000 -e CANARY_PCT=0 ml-deployment-docker:latest
