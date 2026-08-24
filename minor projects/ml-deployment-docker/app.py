@@ -18,8 +18,8 @@ pipeline = Pipeline([
 pipeline.fit(X_train, y_train)
 
 # save everything not just the model
-os.makedirs('models/v1', exist_ok=True)
-joblib.dump(pipeline, 'models/v1/pipeline.pkl')
+os.makedirs('models/v2', exist_ok=True)
+joblib.dump(pipeline, 'models/v2/pipeline.pkl')
 print(f'Pipeline saved: Accuracy: {pipeline.score(X_test,y_test):.3f}')
 
 # from sklearn.metrics import classification_report, confusion_matrix
@@ -41,10 +41,10 @@ import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI(title="ML PREDICTION API",version='1.0')
+app = FastAPI(title="ML PREDICTION API",version='2.0')
 
 # Load at startup, not per request
-MODEL_VERSION = os.getenv("MODEL_VERSION", "v1")
+MODEL_VERSION = os.getenv("MODEL_VERSION", "v2")
 pipeline = joblib.load(f"models/{MODEL_VERSION}/pipeline.pkl")
 
 class PredictRequest(BaseModel):
@@ -55,6 +55,10 @@ class PredictResponse(BaseModel):
   prediction: int
   probability : float
   model_version : str
+
+@app.get("/")
+def root():
+  return {"message": f"Welcome to the ML Prediction API. Use /predict endpoint to get predictions. Version-{MODEL_VERSION}"}
 
 @app.post("/predict", response_model = PredictResponse)
 def predict(request: PredictRequest):
