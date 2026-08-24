@@ -1,0 +1,60 @@
+# =========================
+# Python & Bytecode
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# =========================
+# Virtual Environments
+# =========================
+venv/
+.venv/
+env/
+.env/
+pip-wheel-metadata/
+
+# =========================
+# Secrets & Configurations
+# =========================
+.env
+*.secret
+
+# =========================
+# IDEs & Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Logs & Databases
+# =========================
+*.log
+*.sqlite3
+
+# =========================
+# OS Generated Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Testing & Caching
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# =========================
+# Machine Learning / Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# Note: You may want to ignore large model files depending on your deployment strategy. 
+# If you don't want to push models to GitHub, uncomment the line below:
+# models/**/*.pkl

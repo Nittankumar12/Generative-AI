@@ -1,0 +1,40 @@
+# ============================================================
+# Dockerfile - Optimized for ML Serving
+# ============================================================
+# Use slim base (120MB vs 900MB for full image)
+FROM python:3.12-slim
+
+# System deps for sklearn/XGBoost (libgomp = OpenMP)
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# LAYER CACHING: requirements first, code second
+# Changing app.py won't trigger pip install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy model artifacts and application code
+COPY models/ ./models/
+COPY app.py .
+
+# SECURITY: non-root user
+RUN useradd -m appuser && chown -R appuser /app
+USER appuser
+
+# Ensure Python output appears in docker logs
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE 8000
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
+# ============================================================
+# Build, test, deploy
+# ============================================================
+# Build:  docker build -t ml-deployment-docker:v1 .
+# Test:   docker run -p 8000:8000 ml-deployment-docker:v1
+# Verify: curl http://localhost:8000/health
+# Deploy: docker push registry.example.com/ml-ap:v1
